@@ -13,22 +13,26 @@ public class Celula : MonoBehaviour
     };
     [Range(0f, 1f)]
     public float epsilon = 0.3f;
+    // el piso: aunque baje mucho, nunca deja de explorar del todo
     public float epsilonMinimo = 0.01f;
     [Range(0f, 1f)]
     public float factorDecaimiento = 0.85f;
 
     [Header("Eliminación de colores malos")]
     public int rondaMinimaAntesDeEliminar = 5;
+    // qué tan por debajo del mejor tiene que quedar un color para que lo saquemos
     public float margenEliminacion = 2f;
 
     [Header("Efectos")]
     public AudioClip explosionSFX;
     public GameObject explosionEffect;
 
+    // un puntaje por color: +1 si sobrevivió la ronda, -1 si le dieron clic
     private float[] puntajes;
     private bool[] colorActivo;
     private int colorActualIndice = 0;
     private bool fueDetectada = false;
+    // en la primera ronda todavía no hay color previo al que darle puntos
     private bool haHechoPrimeraRonda = false;
     private int rondaActual = 0;
 
@@ -53,6 +57,7 @@ public class Celula : MonoBehaviour
 
     public void NuevaRonda()
     {
+        // si llegó al final de la ronda sin que le dieran clic, su color se ganó un punto
         if (haHechoPrimeraRonda && !fueDetectada)
         {
             puntajes[colorActualIndice] += 1f;
@@ -62,6 +67,7 @@ public class Celula : MonoBehaviour
         haHechoPrimeraRonda = true;
         rondaActual++;
 
+        // al principio prueba mucho y con las rondas se va quedando con lo que sirve
         epsilon = Mathf.Max(epsilonMinimo, epsilon * factorDecaimiento);
 
         if (rondaActual >= rondaMinimaAntesDeEliminar)
@@ -71,9 +77,11 @@ public class Celula : MonoBehaviour
 
         colorActualIndice = ElegirColor();
         AplicarParametros();
+        // si estaba oculta porque le dieron clic, aquí vuelve a aparecer con su color nuevo
         gameObject.SetActive(true);
     }
 
+    // eliminación sucesiva: cada ronda saca los colores que quedaron muy atrás del mejor
     private void EliminarColoresMalos()
     {
         float mejor = MejorPuntajeActivo();
@@ -86,6 +94,7 @@ public class Celula : MonoBehaviour
 
         for (int i = 0; i < puntajes.Length; i++)
         {
+            // dejamos mínimo 2 colores, con uno solo ya no habría nada que comparar
             if (activos <= 2) break;
 
             if (colorActivo[i] && puntajes[i] < mejor - margenEliminacion)
@@ -111,6 +120,7 @@ public class Celula : MonoBehaviour
 
     private int ElegirColor()
     {
+        // epsilon-greedy: a veces explora un color random, si no, se queda con el mejor que conoce
         if (Random.value < epsilon)
         {
             return ColorActivoAlAzar();
@@ -123,6 +133,7 @@ public class Celula : MonoBehaviour
     {
         float mejor = MejorPuntajeActivo();
 
+        // si hay empate elige al azar entre los mejores, para que no gane siempre el primero
         List<int> candidatos = new List<int>();
         for (int i = 0; i < puntajes.Length; i++)
         {
@@ -155,12 +166,15 @@ public class Celula : MonoBehaviour
         {
             Instantiate(explosionEffect, transform.position, Quaternion.identity);
         }
+        // revisamos que exista el AudioManager por si la escena no lo tiene y así no truena
         if (explosionSFX != null && AudioManager.instance != null)
         {
+            // pitch random para que la explosión no suene idéntica cada vez
             AudioManager.instance.PlaySFX(explosionSFX, 1, Random.Range(0.5f, 1.2f));
         }
 
         GameManager.Instancia.RegistrarEliminacion();
+        // la ocultamos en vez de destruirla: si no, pierde sus puntajes y NuevaRonda no la puede revivir
         gameObject.SetActive(false);
     }
 }

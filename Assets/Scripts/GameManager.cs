@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    // singleton: así las células le avisan directo sin tener que buscar el GameManager en la escena
     public static GameManager Instancia;
 
     [Header("Spawn de células")]
@@ -23,6 +24,7 @@ public class GameManager : MonoBehaviour
 
     private float tiempoRestante;
     private int numeroRonda = 1;
+    // las guardamos para reusarlas cada ronda en vez de crear células nuevas
     private List<Celula> celulas = new List<Celula>();
 
     void Awake()
@@ -43,6 +45,7 @@ public class GameManager : MonoBehaviour
             );
             Celula nueva = Instantiate(prefabCelula, posicion, Quaternion.identity);
             celulas.Add(nueva);
+            // esta primera llamada solo les da su color inicial, todavía no hay nada que premiar
             nueva.NuevaRonda();
         }
 
@@ -66,6 +69,7 @@ public class GameManager : MonoBehaviour
         numeroRonda++;
         tiempoRestante = duracionRonda;
 
+        // cada ronda es un paso de aprendizaje: las células reciben su punto y eligen color nuevo
         foreach (Celula celula in celulas)
         {
             celula.NuevaRonda();
@@ -76,8 +80,10 @@ public class GameManager : MonoBehaviour
 
     void ActualizarUI()
     {
+        // los textos son opcionales, si no los arrastras en el Inspector no pasa nada
         if (textoTiempo != null)
         {
+            // Ceil para que cuente 10...1 y no 9...0
             textoTiempo.text = Mathf.CeilToInt(tiempoRestante).ToString();
         }
 
@@ -92,6 +98,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // lo llama cada Celula cuando le dan clic
     public void RegistrarEliminacion()
     {
         celulasEliminadas++;
