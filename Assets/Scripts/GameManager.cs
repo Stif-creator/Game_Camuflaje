@@ -88,7 +88,7 @@ public class GameManager : MonoBehaviour
 
         if (textoPuntaje != null)
         {
-            textoPuntaje.text = "Eliminadas: " + celulasEliminadas;
+            textoPuntaje.text = "Score: " + celulasEliminadas;
         }
     }
 
