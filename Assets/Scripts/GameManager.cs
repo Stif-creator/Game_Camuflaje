@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     [Header("Temporizador de rondas")]
     public float duracionRonda = 10f;
     public Text textoTiempo;
+    public Text textoRonda;
+    public Text textoPuntaje;
 
     private float tiempoRestante;
     private int numeroRonda = 1;
@@ -43,6 +45,8 @@ public class GameManager : MonoBehaviour
             celulas.Add(nueva);
             nueva.NuevaRonda();
         }
+
+        ActualizarUI();
     }
 
     void Update()
@@ -75,6 +79,16 @@ public class GameManager : MonoBehaviour
         if (textoTiempo != null)
         {
             textoTiempo.text = Mathf.CeilToInt(tiempoRestante).ToString();
+        }
+
+        if (textoRonda != null)
+        {
+            textoRonda.text = "Ronda: " + numeroRonda;
+        }
+
+        if (textoPuntaje != null)
+        {
+            textoPuntaje.text = "Eliminadas: " + celulasEliminadas;
         }
     }
 
