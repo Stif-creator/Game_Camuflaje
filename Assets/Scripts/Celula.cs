@@ -12,6 +12,9 @@ public class Celula : MonoBehaviour
     };
     [Range(0f, 1f)]
     public float epsilon = 0.2f;
+    public float epsilonMinimo = 0.02f;
+    [Range(0f, 1f)]
+    public float factorDecaimiento = 0.98f;
 
     private float[] puntajes;
     private int colorActualIndice = 0;
@@ -41,6 +44,9 @@ public class Celula : MonoBehaviour
 
         fueDetectada = false;
         haHechoPrimeraRonda = true;
+
+        epsilon = Mathf.Max(epsilonMinimo, epsilon * factorDecaimiento);
+
         colorActualIndice = ElegirColor();
         AplicarParametros();
         gameObject.SetActive(true);
