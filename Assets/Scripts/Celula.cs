@@ -21,6 +21,10 @@ public class Celula : MonoBehaviour
     public int rondaMinimaAntesDeEliminar = 5;
     public float margenEliminacion = 2f;
 
+    [Header("Efectos")]
+    public AudioClip explosionSFX;
+    public GameObject explosionEffect;
+
     private float[] puntajes;
     private bool[] colorActivo;
     private int colorActualIndice = 0;
@@ -137,6 +141,16 @@ public class Celula : MonoBehaviour
     {
         fueDetectada = true;
         puntajes[colorActualIndice] -= 1f;
+
+        if (explosionEffect != null)
+        {
+            Instantiate(explosionEffect, transform.position, Quaternion.identity);
+        }
+        if (explosionSFX != null && AudioManager.instance != null)
+        {
+            AudioManager.instance.PlaySFX(explosionSFX, 1, Random.Range(0.5f, 1.2f));
+        }
+
         GameManager.Instancia.RegistrarEliminacion();
         gameObject.SetActive(false);
     }
