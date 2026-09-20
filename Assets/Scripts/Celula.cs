@@ -78,11 +78,20 @@ public class Celula : MonoBehaviour
     {
         float mejor = MejorPuntajeActivo();
 
+        int activos = 0;
+        for (int i = 0; i < colorActivo.Length; i++)
+        {
+            if (colorActivo[i]) activos++;
+        }
+
         for (int i = 0; i < puntajes.Length; i++)
         {
+            if (activos <= 2) break;
+
             if (colorActivo[i] && puntajes[i] < mejor - margenEliminacion)
             {
                 colorActivo[i] = false;
+                activos--;
             }
         }
     }
